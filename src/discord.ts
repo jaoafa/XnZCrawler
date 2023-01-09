@@ -98,7 +98,7 @@ export async function sendToDiscord(
       validateStatus: () => true,
     }
   )
-  if(response.status !== 200) {
+  if (response.status !== 200) {
     console.error(response.data)
   }
 }
