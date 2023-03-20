@@ -50,7 +50,6 @@ export class NameMC {
       '--disable-accelerated-2d-canvas',
       '--disable-dev-shm-usage',
       '--disable-gpu',
-      '--disable-setuid-sandbox',
       '--window-size=600,800',
     ]
 
@@ -95,7 +94,27 @@ export class NameMC {
       console.log('Login proxy... done')
     }
 
-    await page.goto(`https://ja.namemc.com/search?q=${name}`)
+    await page.goto(`https://ja.namemc.com/search?q=${name}`, {
+      waitUntil: 'networkidle2',
+    })
+
+    // <span id="challenge-error-text">Please enable Cookies and reload the page.</span>
+    const error = await page.$('#challenge-error-text')
+    if (
+      error &&
+      (await error.evaluate((node) => node.textContent)) ===
+        'Please enable Cookies and reload the page.'
+    ) {
+      await page.reload()
+    }
+
+    // #content div.ctp-checkbox-container label.ctp-checkbox-label
+    const checkbox = await page.$(
+      '#content div.ctp-checkbox-container label.ctp-checkbox-label'
+    )
+    if (checkbox) {
+      await checkbox.click()
+    }
 
     await page.waitForSelector('#status-bar')
 
@@ -178,7 +197,12 @@ export class NameMC {
   }
 
   public async checkNames(names: string[]) {
-    return await Promise.all(names.map((name) => this.checkName(name)))
+    this.browser = await this.initBrowser()
+    const results = []
+    for (const name of names) {
+      results.push(await this.checkName(name))
+    }
+    return results
   }
 
   public async close() {
