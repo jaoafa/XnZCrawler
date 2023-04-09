@@ -73,6 +73,7 @@ export class NameMC {
   }
 
   public async checkName(name: string) {
+    console.log(`checkName: ${name}`)
     if (!this.browser) {
       this.browser = await this.initBrowser()
     }
