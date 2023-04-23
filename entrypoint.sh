@@ -16,7 +16,7 @@ x11vnc -forever -noxdamage -display :99 -nopw -loop -xkb &
 
 while :
 do
-  yarn start || true
+  node index.js || true
 
   echo "Waiting 1 hour..."
 
